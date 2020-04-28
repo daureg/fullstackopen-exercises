@@ -1,0 +1,16 @@
+note over browser:
+browser starts executing js-code
+that requests JSON data from server 
+end note
+
+browser->server: HTTP POST https://fullstack-exampleapp.herokuapp.com/new_notes_spa
+note over browser:
+browser is posting the following JSON:
+[{ content: "text of the note", date: "2019-05-25T15:15:59.905Z"}]
+end note
+server-->browser: 201 created
+note over browser:
+the javascript add the note to the list
+and redraw the whole list
+(including the new items)
+end note
