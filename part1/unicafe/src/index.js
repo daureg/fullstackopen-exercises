@@ -2,15 +2,24 @@ import React, { useState } from 'react'
 import ReactDOM from 'react-dom'
 
 
+const Statistic = ({text, value}) => ( <><p>{text} {value} </p></>)
 const Statistics = ({good, neutral, bad}) => {
-  return (
-    <>
-      <h1>Statistics</h1>
-      <p>Good {good}</p>
-      <p>Neutral {neutral}</p>
-      <p>Bad {bad}</p>
-    </>
-  )
+  const total = good + neutral + bad
+  const avg = (good - bad) / total
+  const pos = 100 * good / total
+  let content = [<p>No feedback given</p>]
+  if (total > 0) {
+      content =
+      [
+        <Statistic text="good" value={good} />,
+        <Statistic text="neutral" value={neutral} />,
+        <Statistic text="bad" value={bad} />,
+        <Statistic text="total" value={total} />,
+        <Statistic text="Average" value={avg.toFixed(2)} />,
+        <Statistic text="Positive" value={pos.toFixed(2)+" %"} />,
+      ]
+    }
+  return [<h1>Statistics</h1>,].concat(content)
 }
 const Button = ({text, onClick}) => {
   return (
