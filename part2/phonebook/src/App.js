@@ -11,6 +11,9 @@ const App = () => {
   }
   const addName = (event) => {
     event.preventDefault()
+    if (persons.find(p => p.name.toLowerCase() === newName.toLowerCase())) {
+      return alert(`${newName} is already in the phonebook`)
+    }
     setPersons(persons.concat({name: newName}))
     setNewName('')
   }
