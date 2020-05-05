@@ -9,13 +9,11 @@ const App = () => {
   ]) 
   const [ newName, setNewName ] = useState('')
   const [ newNumber, setNewNumber ] = useState('')
+  const [ search, setSearch ] = useState('')
 
-  const handleNameChange = (event) => {
-    setNewName(event.target.value)
-  }
-  const handleNumberChange = (event) => {
-    setNewNumber(event.target.value)
-  }
+  const handleNameChange = (event) => { setNewName(event.target.value) }
+  const handleNumberChange = (event) => { setNewNumber(event.target.value) }
+  const handleSearchChange = (event) => { setSearch(event.target.value) }
   const addName = (event) => {
     event.preventDefault()
     if (persons.find(p => p.name.toLowerCase() === newName.toLowerCase())) {
@@ -25,17 +23,20 @@ const App = () => {
     setNewName('')
   }
 
+  const personsToShow = (search.length > 0) ? persons.filter(p => p.name.toLowerCase().includes(search.toLowerCase())) : persons
+
   return (
     <div>
       <h2>Phonebook</h2>
-      <form  onSubmit={addName}>
+      <p><label>Only show names containing <input  onChange={handleSearchChange} type="text" value={search} /></label></p>
+      <form onSubmit={addName}>
         <label>name: <input onChange={handleNameChange} type="text" value={newName} /> </label>
         <label>number: <input onChange={handleNumberChange} type="tel" value={newNumber} /> </label>
           <button type="submit">add</button>
       </form>
       <h2>Numbers</h2>
     <ul>
-      {persons.map(p => <li key={p.name}>{p.name} {p.number}</li>)}
+      {personsToShow.map(p => <li key={p.name}>{p.name} {p.number}</li>)}
     </ul>
     </div>
   )
