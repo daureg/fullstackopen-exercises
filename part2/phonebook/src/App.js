@@ -1,4 +1,7 @@
 import React, { useState } from 'react'
+import SearchFilter from './components/SearchFilter'
+import Persons from './components/Persons'
+import AdditionForm from './components/AdditionForm'
 
 const App = () => {
   const [ persons, setPersons ] = useState([
@@ -25,19 +28,21 @@ const App = () => {
 
   const personsToShow = (search.length > 0) ? persons.filter(p => p.name.toLowerCase().includes(search.toLowerCase())) : persons
 
-  return (
-    <div>
-      <h2>Phonebook</h2>
-      <p><label>Only show names containing <input  onChange={handleSearchChange} type="text" value={search} /></label></p>
+  /*
       <form onSubmit={addName}>
         <label>name: <input onChange={handleNameChange} type="text" value={newName} /> </label>
         <label>number: <input onChange={handleNumberChange} type="tel" value={newNumber} /> </label>
           <button type="submit">add</button>
       </form>
+  */
+
+  return (
+    <div>
+      <h2>Phonebook</h2>
+      <SearchFilter changeHandler={handleSearchChange} maintainedState={search} />
+      <AdditionForm addName={addName} handleNameChange={handleNameChange} handleNumberChange={handleNumberChange} newName={newName} newNumber={newNumber} />
       <h2>Numbers</h2>
-    <ul>
-      {personsToShow.map(p => <li key={p.name}>{p.name} {p.number}</li>)}
-    </ul>
+      <Persons persons={personsToShow} />
     </div>
   )
 }
