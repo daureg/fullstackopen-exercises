@@ -21,14 +21,22 @@ const App = () => {
 
   const addName = (event) => {
     event.preventDefault()
-    if (persons.find(p => p.name.toLowerCase() === newName.toLowerCase())) {
-      return alert(`${newName} is already in the phonebook`)
+    const matches = persons.filter(p => p.name.toLowerCase() === newName.toLowerCase())
+    if (matches.length === 1) {
+      if (window.confirm(`${newName} is already in the phonebook, replace the old number?`)) {
+        const p = matches[0]
+        const newPerson = {...p, number: newNumber}
+        personService
+          .update(p.id, newPerson)
+          .then(returnedPerson => setPersons(persons.map(p => p.id === returnedPerson.id ? returnedPerson : p)))
+      }
     }
     personService
       .create({name: newName, number: newNumber})
       .then(createdPerson => {
         setPersons(persons.concat(createdPerson))
         setNewName('')
+        setNewNumber('')
         setSearch('')
       })
   }
