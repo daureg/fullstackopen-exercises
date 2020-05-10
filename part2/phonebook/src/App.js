@@ -33,6 +33,14 @@ const App = () => {
       })
   }
 
+  const removePerson = (person) => {
+    if (window.confirm(`Are you sure you want to remove ${person.name}`)) {
+      personService
+        .remove(person.id)
+        .then(() => { setPersons(persons.filter(p => p.id !== person.id)) })
+    }
+  }
+
   const personsToShow = (search.length > 0) ? persons.filter(p => p.name.toLowerCase().includes(search.toLowerCase())) : persons
 
   return (
@@ -41,7 +49,7 @@ const App = () => {
       <SearchFilter changeHandler={handleSearchChange} maintainedState={search} />
       <AdditionForm addName={addName} handleNameChange={handleNameChange} handleNumberChange={handleNumberChange} newName={newName} newNumber={newNumber} />
       <h2>Numbers</h2>
-      <Persons persons={personsToShow} />
+      <Persons persons={personsToShow} removePerson={removePerson} />
     </div>
   )
 }
