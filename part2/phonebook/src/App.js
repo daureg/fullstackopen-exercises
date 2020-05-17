@@ -48,7 +48,7 @@ const App = () => {
             setPersons(persons.map(p => p.id === returnedPerson.id ? returnedPerson : p))
             showSuccess(`changed number of ${returnedPerson.name}`)
           })
-          .catch((error) => { console.debug(error); showError(`Can't update number of ${newPerson.name}`)})
+          .catch((error) => { console.debug(error.response); showError(`Can't update number of ${newPerson.name}: ${error.response.data.error}`) })
       }
     }
     else {
@@ -62,7 +62,7 @@ const App = () => {
           setNewNumber('')
           setSearch('')
         })
-        .catch((error) => { console.debug(error); showError(`Can't create ${newName}`)})
+        .catch((error) => { console.debug(error.response); showError(`Can't create ${newName}: ${error.response.data.error}`) })
     }
   }
 
@@ -71,7 +71,7 @@ const App = () => {
       personService
         .remove(person.id)
         .then(() => { setPersons(persons.filter(p => p.id !== person.id)) })
-      .catch((error) => { console.debug(error); showError(`Can't remove ${person.name}`)})
+      .catch((error) => { console.debug(error.response); showError(`Can't remove ${person.name}: ${error.response.data.error}`)})
     }
   }
 
