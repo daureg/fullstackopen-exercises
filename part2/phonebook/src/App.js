@@ -51,17 +51,19 @@ const App = () => {
           .catch((error) => { console.debug(error); showError(`Can't update number of ${newPerson.name}`)})
       }
     }
-    personService
-      .create({name: newName, number: newNumber})
-      .then(createdPerson => {
-        setPersons(persons.concat(createdPerson))
-        showSuccess(`successfully added ${createdPerson.name} to the list`)
-        setTimeout(() => {setNotifMessage(null)}, 2000)
-        setNewName('')
-        setNewNumber('')
-        setSearch('')
-      })
-      .catch((error) => { console.debug(error); showError(`Can't create ${newName}`)})
+    else {
+      personService
+        .create({name: newName, number: newNumber})
+        .then(createdPerson => {
+          setPersons(persons.concat(createdPerson))
+          showSuccess(`successfully added ${createdPerson.name} to the list`)
+          setTimeout(() => {setNotifMessage(null)}, 2000)
+          setNewName('')
+          setNewNumber('')
+          setSearch('')
+        })
+        .catch((error) => { console.debug(error); showError(`Can't create ${newName}`)})
+    }
   }
 
   const removePerson = (person) => {
