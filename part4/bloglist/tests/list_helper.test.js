@@ -91,3 +91,43 @@ describe('the favorite blog', () => {
     expect(listHelper.favoriteBlog(blogs)).toEqual(expected)
   })
 })
+
+describe('the author with most written blogs', () => {
+  test('of an empty list is empty', () => {
+    expect(listHelper.mostBlog([])).toEqual({})
+  })
+  test('of an single blog list is that author', () => {
+    const expected = {
+      author: 'Michael Chan',
+      blogs: 1,
+    }
+    expect(listHelper.mostBlog(listOneBlog)).toEqual(expected)
+  })
+  test('of a bigger list to be one of those with the most blogs', () => {
+    const expected = {
+      author: 'Robert C. Martin',
+      blogs: 3,
+    }
+    expect(listHelper.mostBlog(blogs)).toEqual(expected)
+  })
+})
+
+describe('the author with most like', () => {
+  test('of an empty list is empty', () => {
+    expect(listHelper.mostLikes([])).toEqual({})
+  })
+  test('of an single blog list is that author', () => {
+    const expected = {
+      author: 'Michael Chan',
+      likes: 7,
+    }
+    expect(listHelper.mostLikes(listOneBlog)).toEqual(expected)
+  })
+  test('of a bigger list to be one of those with the most likes', () => {
+    const expected = {
+      author: 'Edsger W. Dijkstra',
+      likes: 17,
+    }
+    expect(listHelper.mostLikes(blogs)).toEqual(expected)
+  })
+})
