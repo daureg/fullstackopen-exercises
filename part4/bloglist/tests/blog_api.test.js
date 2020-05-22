@@ -23,6 +23,11 @@ test('returns the right amount of blogs as json', async () => {
     .expect((res) => { if (res.body.length !== numBlogsExpected) {throw Error('not the right size')} })
 })
 
+test('a blog has an "id" field', async () => {
+  const blogs = await api.get('/api/blogs')
+  expect(blogs.body[0]['id']).toBeDefined()
+})
+
 afterAll(() => {
   mongoose.connection.close()
 })
