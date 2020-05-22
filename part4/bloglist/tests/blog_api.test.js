@@ -28,6 +28,20 @@ test('a blog has an "id" field', async () => {
   expect(blogs.body[0]['id']).toBeDefined()
 })
 
+test('can add of blog post with POST', async () => {
+  const newBlog = { author: 'Michael', likes: 3, url: 'http://github.com/', title: 'Basketball' }
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const response = await api.get('/api/blogs')
+  const content = response.body.filter(b => b.title === 'Basketball')[0]
+  expect(response.body).toHaveLength(helper.initialBlogs.length + 1)
+  expect(content.author).toBe('Michael')
+})
+
 afterAll(() => {
   mongoose.connection.close()
 })
