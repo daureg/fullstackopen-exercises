@@ -42,6 +42,18 @@ test('can add of blog post with POST', async () => {
   expect(content.author).toBe('Michael')
 })
 
+
+test('POSTing without like field set default value to 0', async () => {
+  const newBlog = { author: 'Michael', url: 'http://github.com/', title: 'Basketball' }
+  await api.post('/api/blogs').send(newBlog)
+  const response = await api.get('/api/blogs')
+  const content = response.body.filter(b => b.title === 'Basketball')[0]
+  expect(content.likes).toBe(0)
+})
+
+test('', async () => {
+})
+
 afterAll(() => {
   mongoose.connection.close()
 })
