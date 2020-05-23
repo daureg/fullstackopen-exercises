@@ -51,6 +51,13 @@ test('POSTing without like field set default value to 0', async () => {
   expect(content.likes).toBe(0)
 })
 
+test('can only POST when title and url are present', async () => {
+  const noTitle = { author: 'Michael', url: 'http://github.com/' }
+  await api.post('/api/blogs').send(noTitle).expect(400)
+  const noURL = { author: 'Michael', title: 'Basketball' }
+  await api.post('/api/blogs').send(noURL).expect(400)
+})
+
 test('', async () => {
 })
 
