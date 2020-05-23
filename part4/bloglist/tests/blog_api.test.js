@@ -58,6 +58,22 @@ test('can only POST when title and url are present', async () => {
   await api.post('/api/blogs').send(noURL).expect(400)
 })
 
+describe('deletion of a blog', () => {
+  test('succeeds with status code 204 if id is valid', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToDelete = blogsAtStart[0]
+
+    await api
+      .delete(`/api/blogs/${blogToDelete.id}`)
+      .expect(204)
+
+    const blogsAtEnd = await helper.blogsInDb()
+    expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length - 1)
+
+    const urls = blogsAtEnd.map(r => r.url)
+    expect(urls).not.toContain(blogToDelete.url)
+  })
+})
 test('', async () => {
 })
 
