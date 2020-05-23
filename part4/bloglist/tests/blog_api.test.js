@@ -74,6 +74,24 @@ describe('deletion of a blog', () => {
     expect(urls).not.toContain(blogToDelete.url)
   })
 })
+describe('update of a blog', () => {
+  test('succeeds with status code 200 if id is valid, and likes is incremented', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToUpdate = blogsAtStart[0]
+    const initialLikes = blogToUpdate['likes']
+    blogToUpdate['likes'] = initialLikes + 5
+    await api
+      .put(`/api/blogs/${blogToUpdate.id}`)
+      .send(blogToUpdate)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    const blogsAtEnd = await helper.blogsInDb()
+    expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
+    const updatedBlog = blogsAtEnd.filter(b => b.id === blogToUpdate.id)[0]
+    expect(updatedBlog['likes']).toBe(initialLikes + 5)
+  })
+})
 test('', async () => {
 })
 
