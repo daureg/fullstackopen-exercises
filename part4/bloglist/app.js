@@ -20,6 +20,7 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFind
 app.use(cors())
 app.use(express.static('build'))
 app.use(express.json())
+app.use(middleware.tokenExtractor)
 morgan.token('body', (req) => JSON.stringify(req.body))
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 app.use('/api/blogs', blogsRouter)
