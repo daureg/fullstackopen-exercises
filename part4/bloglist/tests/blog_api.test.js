@@ -92,8 +92,6 @@ describe('update of a blog', () => {
     expect(updatedBlog['likes']).toBe(initialLikes + 5)
   })
 })
-test('', async () => {
-})
 
 afterAll(() => {
   mongoose.connection.close()
