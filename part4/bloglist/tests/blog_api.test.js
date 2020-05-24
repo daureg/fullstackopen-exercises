@@ -2,16 +2,29 @@ const supertest = require('supertest')
 const mongoose = require('mongoose')
 const helper = require('./test_helper')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 const app = require('../app')
 const api = supertest(app)
 
-beforeEach(async () => {
-  await Blog.deleteMany({})
+let userId = null
+let loginInfo = null
 
+beforeEach(async () => {
+  await Promise.all([Blog.deleteMany({}), User.deleteMany({})])
+  await api.post('/api/users').send({ name: '', username: 'felix', password: 'password', })
+  const user = await User.findOne({ username: 'felix', })
+  userId = user._id.toString()
+
+  const blogIds = []
   for (let blog of helper.initialBlogs) {
-    let blogObject = new Blog(blog)
-    await blogObject.save()
+    let blogObject = new Blog({ ...blog, user: userId })
+    let savedBlog = await blogObject.save()
+    blogIds.push(savedBlog._id.toString())
   }
+  user.blogs = blogIds
+  await user.save()
+  const creds = await api.post('/api/login').send({ username: 'felix', password: 'password', })
+  loginInfo = creds.body
 })
 
 test('returns the right amount of blogs as json', async () => {
@@ -28,34 +41,43 @@ test('a blog has an "id" field', async () => {
   expect(blogs.body[0]['id']).toBeDefined()
 })
 
-test('can add of blog post with POST', async () => {
-  const newBlog = { author: 'Michael', likes: 3, url: 'http://github.com/', title: 'Basketball' }
-  await api
-    .post('/api/blogs')
-    .send(newBlog)
-    .expect(201)
-    .expect('Content-Type', /application\/json/)
+describe('posting a new blog', () => {
+  test('is possible with POST', async () => {
+    const newBlog = { user: userId, author: 'Michael', likes: 3, url: 'http://github.com/', title: 'Basketball' }
+    await api
+      .post('/api/blogs')
+      .set('Authorization', `Bearer ${loginInfo.token}`)
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
 
-  const response = await api.get('/api/blogs')
-  const content = response.body.filter(b => b.title === 'Basketball')[0]
-  expect(response.body).toHaveLength(helper.initialBlogs.length + 1)
-  expect(content.author).toBe('Michael')
-})
+    const response = await api.get('/api/blogs')
+    const content = response.body.filter(b => b.title === 'Basketball')[0]
+    expect(response.body).toHaveLength(helper.initialBlogs.length + 1)
+    expect(content.author).toBe('Michael')
+  })
 
+  test('fail in the absence of a valid token', async () => {
+    const blog = helper.initialBlogs[0]
+    await api.post('/api/blogs').send(blog).expect(401)
+    const badToken = loginInfo.token.substring(12)
+    await api.post('/api/blogs').set('Authorization', `Bearer ${badToken}`).send(blog).expect(401)
+  })
 
-test('POSTing without like field set default value to 0', async () => {
-  const newBlog = { author: 'Michael', url: 'http://github.com/', title: 'Basketball' }
-  await api.post('/api/blogs').send(newBlog)
-  const response = await api.get('/api/blogs')
-  const content = response.body.filter(b => b.title === 'Basketball')[0]
-  expect(content.likes).toBe(0)
-})
+  test('without like field set default value to 0', async () => {
+    const newBlog = { user: userId, author: 'Michael', url: 'http://github.com/', title: 'Basketball' }
+    await api.post('/api/blogs').set('Authorization', `Bearer ${loginInfo.token}`).send(newBlog)
+    const response = await api.get('/api/blogs')
+    const content = response.body.filter(b => b.title === 'Basketball')[0]
+    expect(content.likes).toBe(0)
+  })
 
-test('can only POST when title and url are present', async () => {
-  const noTitle = { author: 'Michael', url: 'http://github.com/' }
-  await api.post('/api/blogs').send(noTitle).expect(400)
-  const noURL = { author: 'Michael', title: 'Basketball' }
-  await api.post('/api/blogs').send(noURL).expect(400)
+  test('only succeeds when title and url are present', async () => {
+    const noTitle = { user: userId, author: 'Michael', url: 'http://github.com/' }
+    await api.post('/api/blogs').set('Authorization', `Bearer ${loginInfo.token}`).send(noTitle).expect(400)
+    const noURL = { author: 'Michael', title: 'Basketball' }
+    await api.post('/api/blogs').set('Authorization', `Bearer ${loginInfo.token}`).send(noURL).expect(400)
+  })
 })
 
 describe('deletion of a blog', () => {
