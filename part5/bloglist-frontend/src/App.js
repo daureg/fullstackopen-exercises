@@ -12,6 +12,9 @@ const App = () => {
   const [user, setUser] = useState(null)
   const [notifMessage, setNotifMessage] = useState(null)
   const [notifKind, setNotifKind] = useState('error')
+  const [title  , setTitle] = useState('')
+  const [author , setAuthor] = useState('')
+  const [url    , setUrl] = useState('')
   const showSuccess = (msg) => {
         setNotifKind("success")
         setNotifMessage(msg)
@@ -40,6 +43,20 @@ const App = () => {
     event.preventDefault()
     setUser(null)
     window.localStorage.removeItem('loggedNoteappUser')
+  }
+  const addBlog = async (event) => {
+    event.preventDefault()
+    try {
+      const acceptedBlog = await blogService.addOne({ author, title, url }, user.token)
+      setTitle('')
+      setAuthor('')
+      setUrl('')
+      setBlogs(blogs.concat(acceptedBlog))
+      showSuccess(`Added '${acceptedBlog.title}'`)
+    } catch (exception) {
+      console.log(exception)
+      showError('Could not submit this blog')
+    }
   }
 
 
@@ -76,6 +93,13 @@ const App = () => {
     <div>
       <Notification message={notifMessage} kind={notifKind} />
       <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p> 
+      <h3>Add a blog</h3>
+      <form onSubmit={addBlog}>
+        <label>title: <input value={title} onChange={({ target }) => setTitle(target.value)} /></label>
+        <label>author: <input value={author} onChange={({ target }) => setAuthor(target.value)} /></label>
+        <label>url: <input value={url} onChange={({ target }) => setUrl(target.value)} /></label>
+        <button type="submit">add</button>
+      </form>
       <h2>blogs</h2>
       {blogs.map(blog => <Blog key={blog.id} blog={blog} />)}
     </div>
